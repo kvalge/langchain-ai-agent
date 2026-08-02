@@ -1,6 +1,7 @@
 # LangChain AI Agent (Gemini CLI)
 
 A simple command-line app that sends prompts to Google Gemini and prints the response.
+Still in progress
 
 ## Features
 
