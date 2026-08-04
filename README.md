@@ -1,6 +1,6 @@
 # LangChain AI Agent (Gemini CLI)
 
-Intelligent meeting notes agent that analyses transcripts, highlights key discussion points, extracts decisions and action items, and produces a summary.
+Intelligent meeting notes agent that analyses transcripts, highlights key discussion points, extracts decisions and action items, and produces a summary. After notes are drafted, you can ask follow-up questions in the terminal; the output file is written only when you type `exit`.
 
 ## Generated outputs
 
@@ -10,11 +10,13 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 ## Features
 
 - LangChain agent powered by Google Gemini
+- Conversational session with short-term memory (one thread per transcript date)
 - Drop transcripts into `input/transcripts/` — no hardcoded filename in code
 - Auto-discovers pending `transcript_YYYY-MM-DD.txt` files and skips already-processed dates
-- Agent output saved under `output/` as `meeting_notes_YYYY-MM-DD.txt` (date from the transcript)
+- Follow-up questions in the terminal before saving
+- Final notes saved under `output/` as `meeting_notes_YYYY-MM-DD.txt` only after `exit`
 - Each new output file is linked in this README under **Generated outputs**
-- Model configured via environment variables
+- Model and API key configured via environment variables
 
 ## Project structure
 
@@ -23,8 +25,9 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 ├── input/
 │   └── transcripts/          # Meeting transcript input files
 ├── output/                   # Generated meeting notes (dated filenames)
-├── encoding.py               # Transcript discovery / dated outputs / README links
-├── main.py                   # Agent entry point
+├── transcript_io.py          # Transcript discovery / dated outputs / README links
+├── tools.py                  # Agent helper tools
+├── main.py                   # Agent + conversational session entry point
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -33,9 +36,10 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 | Path | Description |
 |------|-------------|
 | `input/transcripts/` | Place `transcript_YYYY-MM-DD.txt` files here |
-| `output/` | Agent writes `meeting_notes_YYYY-MM-DD.txt` here (tracked in git) |
-| `main.py` | Runs the meeting-notes agent over pending transcripts |
-| `encoding.py` | Discovery, file I/O, and README link updates |
+| `output/` | Final `meeting_notes_YYYY-MM-DD.txt` files (written after `exit`) |
+| `main.py` | Runs the agent and follow-up session |
+| `tools.py` | Extraction helper tools for the agent |
+| `transcript_io.py` | Discovery, file I/O, and README link updates |
 
 ## Prerequisites
 
@@ -85,19 +89,20 @@ Use a model name that is available for your API key. See the [Gemini models list
 
 ## Usage
 
-Drop-and-run workflow (no filename typing, no code edits):
-
-1. Add a transcript as `input/transcripts/transcript_YYYY-MM-DD.txt` (for example `transcript_2026-08-05.txt`).
+1. Add a transcript as `input/transcripts/transcript_YYYY-MM-DD.txt`.
 2. Run:
 
 ```bash
 python main.py
 ```
 
-3. The agent processes every **pending** transcript (no matching output yet):
-   - Prints the summary to the console
-   - Saves `output/meeting_notes_YYYY-MM-DD.txt` using the date from the transcript filename
-   - Adds a markdown link under **Generated outputs** in this README
+3. For each **pending** transcript (no matching output yet):
+   - The agent prints draft meeting notes
+   - A follow-up banner explains how to continue
+   - Ask questions at `Follow-up (type 'exit' to save notes):` (session memory keeps the transcript and prior answers)
+   - Type `exit` or `quit` to finish that transcript (reminders also appear after each answer)
+   - The agent produces the final consolidated notes and saves `output/meeting_notes_YYYY-MM-DD.txt`
+   - A markdown link is added under **Generated outputs**
 4. Re-running `python main.py` skips dates that already have an output.
 
 | Role | Pattern | Example |

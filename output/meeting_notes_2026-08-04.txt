@@ -1,53 +1,38 @@
-### Meeting Overview
-* **Title:** Weekly Data Analytics Sync — Retail Banking Division  
-* **Date:** August 3, 2026  
-* **Attendees:** Anu (Product Owner), Kati (Data Analyst), Liisa (Reporting Engineer), Mart (Data Engineer), Toomas (Risk Manager)  
+# Meeting Notes: Weekly Data Analytics Sync – Retail Banking Division
+
+**Participants:**
+* Anu (Meeting Lead)
+* Toomas (Risk)
+* Mart (Data Engineering / ETL)
+* Liisa (Data / Documentation)
+* Kati (Dashboards / Analytics)
 
 ---
 
-### Executive Summary
-The meeting focused on data warehouse migration updates, data quality issues (specifically missing March transactions and mixed currency formats), default rate trends, fraud detection alert adjustments, and compliance alignment. Immediate priorities for the week were established, including resolving the missing transaction data prior to Friday's compliance review.
+### 1. Summary
+The team discussed Q2 personal loan default trends (currently 2.3% above forecast) and necessary data fixes ahead of Friday's compliance review. The PostgreSQL ETL pipeline migration is mostly complete, but missing March transaction records need urgent investigation. To prepare for upcoming reporting, the team agreed to prioritize currency standardization across regional branches, clean up dashboard test data, address high false-positive rates in fraud detection alerts, and complete historical data migration over the next two sprints.
 
 ---
 
-### Key Discussion Points
-1. **Loan Default Trends & Data Quality:**  
-   * Anu provided an update on Q2 loan default trends, noting an increase in default rates for personal loans issued in Q1.  
-   * Flagged test accounts currently affect the default rate calculations and need filtering.
-
-2. **ETL Pipeline & Historical Migration:**  
-   * Mart updated the team on the ETL pipeline migration to the new PostgreSQL warehouse.  
-   * Historical data migration (2019–2023) is estimated to take two sprints.  
-   * Liisa raised concerns regarding missing March transaction records affecting reconciliation reports. The cause (ingestion job vs. source system outage) is under investigation.
-
-3. **Credit Risk Model & Data Retention:**  
-   * The team discussed customer segmentation for the upcoming credit risk model, with Anu proposing adding "income bracket" as a variable.  
-   * Discussion held on updating data retention policies per revised compliance guidelines.
-
-4. **Currency Field Standardization:**  
-   * Kati highlighted that regional branches still log currency values in mixed formats.
-
-5. **Fraud Detection Model Feedback:**  
-   * Branch managers reported excessive false positives with the current fraud scoring model. The team discussed adjusting model thresholds to reduce false positives without missing detections.
+### 2. Key Discussion Points
+* **Loan Default Trends & Compliance:** Default rates for Q1 personal loans are 2.3% above forecast. Corrected datasets are required before Friday’s Risk compliance review.
+* **ETL Migration & Missing March Data:** PostgreSQL pipeline migration is mostly finished, but missing March transaction records are blocking the monthly reconciliation report. It is undetermined whether the cause is a new ingestion job issue or a source system outage.
+* **Mixed Currency Formatting:** Regional branches are logging currency in varied formats, which will block accurate Q3 reporting unless standardized.
+* **Fraud Detection False Positives:** Branch managers reported excessive false alarms from the new fraud scoring model. Threshold adjustments discussed weeks ago were never implemented.
+* **Catalog Access & Historical Migration:** Documentation of new tables requires updated data catalog permissions. Migration of historical data (2019–2023) is scheduled for the upcoming sprints.
 
 ---
 
-### Decisions Made
-* **Currency Standardization:** Prioritized for completion before the Q3 reporting cycle.
-* **Default Rate Calculation:** Dashboard filters will be updated to exclude flagged test accounts.
-* **Weekly Focus:** Top priorities for the week are the missing transaction investigation, automated currency normalization proposal, and fraud model threshold review.
-* **Next Meeting:** Scheduled for the same time next week; Sipsik will also attend.
+### 3. Decisions
+* **Prioritize Currency Normalization:** Agreed by Risk and Analytics to standardize currency formats before Q3 reporting, handling normalization automatically at the ETL layer.
+* **Dashboard Filter Adjustment:** Filter out flagged test accounts to remove noise from default rate calculations.
+* **Historical Data Migration Timeline:** Target completion of the 2019–2023 historical data migration within two sprints.
 
 ---
 
-### Action Items
-
-| Owner | Action Item | Deadline / Timeline |
-| :--- | :--- | :--- |
-| **Mart** | Investigate missing March transaction records and report back | Wednesday |
-| **Mart** | Draft a proposal for automated currency normalization in the ETL layer | Prior to Q3 cycle |
-| **Kati** | Update dashboard filters to exclude flagged test accounts | Immediate |
-| **Kati** | Grant Liisa access to the updated data catalog | End of Day |
-| **Liisa** | Prepare a data quality report comparing old and new warehouse outputs | TBD |
-| **Toomas** | Coordinate with Legal on new retention requirements and share findings | Next week |
-| **Toomas** | Review fraud model performance metrics and share results | Next week's meeting |
+### 4. Action Items
+* **Mart:** Investigate missing March transaction records and report back by **Wednesday**.
+* **Kati:** Update dashboard filters to exclude flagged test accounts from default rate calculations.
+* **Mart:** Draft a proposal for automated currency normalization in the ETL layer.
+* **Toomas:** Review fraud scoring model performance metrics and present findings at **next week's meeting**.
+* **Kati:** Grant Liisa access to the updated data catalog by **end of day**.

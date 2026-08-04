@@ -101,7 +101,6 @@ def save_output(
     date_stamp = transcript_date or datetime.now().strftime("%Y-%m-%d")
     output_path = OUTPUT_DIR / f"{prefix}_{date_stamp}.txt"
 
-    # If a file for this date already exists, append a time suffix
     if output_path.exists():
         time_stamp = datetime.now().strftime("%H%M%S")
         output_path = OUTPUT_DIR / f"{prefix}_{date_stamp}_{time_stamp}.txt"
