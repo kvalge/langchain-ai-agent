@@ -1,0 +1,31 @@
+Meeting: Weekly Data Analytics Sync — Retail Banking Division
+Date: 2026-08-03
+Attendees: Kati (Data Analyst), Mart (Data Engineer), Liisa (Reporting Engineer), Toomas (Risk Manager), Anu (Product Owner)
+
+Anu opened the meeting and gave an update on Q2 loan default trends.
+The team discussed the increase in default rates for personal loans issued in Q1.
+Mart provided an update on the ETL pipeline migration to the new PostgreSQL warehouse.
+Liisa raised concerns about missing transaction records for March, affecting the monthly reconciliation report.
+The team discussed whether the missing records were caused by the new ingestion job or a source system outage.
+Toomas noted that Risk needs the corrected dataset before Friday's compliance review.
+Mart will investigate the missing March transaction records and report back by Wednesday.
+Kati will update the dashboard filters to exclude flagged test accounts from the default rate calculation.
+The team discussed customer segmentation for the upcoming credit risk model.
+Anu proposed adding income bracket as a new segmentation variable.
+Liisa will prepare a data quality report comparing the old and new warehouse outputs.
+The team discussed data retention policy changes required by the updated compliance guidelines.
+Toomas will coordinate with Legal on the new retention requirements and share findings next week.
+Kati raised a discussion point about standardizing currency fields across branches, since some regional branches still log values in mixed formats.
+The team agreed that currency standardization should be prioritized before the Q3 reporting cycle.
+Mart will draft a proposal for automated currency normalization in the ETL layer.
+Anu gave an update on stakeholder feedback from the branch managers regarding the new fraud detection alerts.
+Several branch managers reported too many false positives in the current fraud scoring model.
+The team discussed adjusting the fraud model threshold to reduce false positives without increasing missed detections.
+Toomas will review the fraud model performance metrics and share results at next week's meeting.
+Liisa needs access to the updated data catalog to finish documenting the new tables.
+Kati will grant Liisa access to the data catalog by end of day.
+The team discussed the timeline for migrating historical data (2019–2023) into the new warehouse.
+Mart estimated the historical migration should be completed within two sprints.
+Anu closed the meeting by summarizing that the top priorities for this week are the missing transaction investigation, the currency standardization proposal, and the fraud model threshold review.
+Next meeting scheduled for the same time next week.
+Then Sipsik will also attend the meeting.

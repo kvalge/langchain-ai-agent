@@ -1,0 +1,80 @@
+Weekly Data Analytics Sync - Retail Banking Division
+Transcript
+
+Anu   0:02
+Okay, I think we can get started. Thanks everyone for joining. Let's do a quick update on Q2 loan default trends before we move on.
+
+Anu   0:14
+So we discussed this a bit last week, but the default rates for personal loans issued in Q1 are still trending upward. About 2.3% above forecast.
+
+Toomas   0:31
+Yeah, Risk has been tracking that too. We need the corrected dataset before Friday's compliance review, so whatever's blocking that needs to move fast.
+
+Mart   0:45
+That actually ties into what I wanted to bring up. I'll give an update on the ETL pipeline migration to the new PostgreSQL warehouse.
+
+Mart   0:52
+Migration is mostly done, but Liisa flagged something with March data.
+
+Liisa   1:03
+Right, we're missing transaction records for March. It's affecting the monthly reconciliation report and I don't know yet if it's the new ingestion job or a source system outage.
+
+Liisa   1:19
+We discussed this briefly on Slack yesterday but didn't land on an answer.
+
+Mart   1:27
+I'll investigate the missing March transaction records and report back by Wednesday.
+
+Toomas   1:35
+Okay, that works, as long as it's before Friday.
+
+Anu   1:42
+Kati, can you give an update on the dashboard side?
+
+Kati   1:47
+Sure. I'll update the dashboard filters to exclude flagged test accounts from the default rate calculation, that should clean up some of the noise we saw last week.
+
+Kati   2:01
+I also wanted to raise a discussion point, some regional branches are still logging currency values in mixed formats. It's going to be a problem for Q3 reporting if we don't standardize it soon.
+
+Anu   2:15
+Good catch. Let's discuss that as a group, does everyone agree it should be prioritized before Q3?
+
+Toomas   2:22
+Agreed from Risk's side.
+
+Liisa   2:24
+Agreed.
+
+Mart   2:26
+Yeah, I'll draft a proposal for automated currency normalization in the ETL layer.
+
+Anu   2:35
+Great. Moving on, I want to give an update on stakeholder feedback from the branch managers regarding the new fraud detection alerts.
+
+Anu   2:44
+Several branch managers reported too many false positives in the current fraud scoring model.
+
+Toomas   2:53
+We discussed adjusting the threshold a few weeks ago but never followed through.
+
+Toomas   2:58
+I'll review the fraud model performance metrics and share results at next week's meeting.
+
+Liisa   3:10
+Before we wrap up, I need access to the updated data catalog to finish documenting the new tables.
+
+Kati   3:15
+I'll grant Liisa access to the data catalog by end of day.
+
+Anu   3:22
+Perfect. Last thing, Mart, timeline for the historical data migration, 2019 through 2023?
+
+Mart   3:30
+Should be doable within two sprints.
+
+Anu   3:36
+Okay, sounds good. So to summarize, top priorities this week are the missing transaction investigation, the currency standardization proposal, and the fraud model threshold review.
+
+Anu   3:48
+Uhh... Same time next week. Thanks everyone.
