@@ -7,6 +7,9 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from encoding import read_transcript, save_output
 
+# New Import for Memory.
+from langgraph.checkpoint.memory import InMemorySaver
+
 # Load environment variables from .env file
 load_dotenv()
 
