@@ -4,13 +4,15 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 
 ## Generated outputs
 
+- [meeting_notes_2026-08-03.txt](output/meeting_notes_2026-08-03.txt)
 - [meeting_notes_2026-08-04.txt](output/meeting_notes_2026-08-04.txt)
 
 ## Features
 
 - LangChain agent powered by Google Gemini
-- Transcripts stored under `input/transcripts/`
-- Agent output saved under `output/` with the run date in the filename
+- Drop transcripts into `input/transcripts/` — no hardcoded filename in code
+- Auto-discovers pending `transcript_YYYY-MM-DD.txt` files and skips already-processed dates
+- Agent output saved under `output/` as `meeting_notes_YYYY-MM-DD.txt` (date from the transcript)
 - Each new output file is linked in this README under **Generated outputs**
 - Model configured via environment variables
 
@@ -21,7 +23,7 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 ├── input/
 │   └── transcripts/          # Meeting transcript input files
 ├── output/                   # Generated meeting notes (dated filenames)
-├── encoding.py               # Read transcripts / write dated outputs / update README links
+├── encoding.py               # Transcript discovery / dated outputs / README links
 ├── main.py                   # Agent entry point
 ├── .env.example
 ├── requirements.txt
@@ -30,10 +32,10 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 
 | Path | Description |
 |------|-------------|
-| `input/transcripts/` | Place transcript `.txt` files here |
-| `output/` | Agent writes dated result files here (tracked in git) |
-| `main.py` | Runs the meeting-notes agent |
-| `encoding.py` | File I/O helpers and README link updates |
+| `input/transcripts/` | Place `transcript_YYYY-MM-DD.txt` files here |
+| `output/` | Agent writes `meeting_notes_YYYY-MM-DD.txt` here (tracked in git) |
+| `main.py` | Runs the meeting-notes agent over pending transcripts |
+| `encoding.py` | Discovery, file I/O, and README link updates |
 
 ## Prerequisites
 
@@ -83,19 +85,25 @@ Use a model name that is available for your API key. See the [Gemini models list
 
 ## Usage
 
-1. Put a transcript file in `input/transcripts/` (for example `transcript_2026-08-03.txt`).
-2. Set `TRANSCRIPT_FILE` in `main.py` to that filename if needed.
-3. Run:
+Drop-and-run workflow (no filename typing, no code edits):
+
+1. Add a transcript as `input/transcripts/transcript_YYYY-MM-DD.txt` (for example `transcript_2026-08-05.txt`).
+2. Run:
 
 ```bash
 python main.py
 ```
 
-The agent:
+3. The agent processes every **pending** transcript (no matching output yet):
+   - Prints the summary to the console
+   - Saves `output/meeting_notes_YYYY-MM-DD.txt` using the date from the transcript filename
+   - Adds a markdown link under **Generated outputs** in this README
+4. Re-running `python main.py` skips dates that already have an output.
 
-1. Prints the summary to the console
-2. Saves it under `output/` as `meeting_notes_YYYY-MM-DD.txt` (adds a time suffix if that file already exists)
-3. Adds a markdown link to the new file under **Generated outputs** in this README
+| Role | Pattern | Example |
+|------|---------|---------|
+| Input | `transcript_YYYY-MM-DD.txt` | `transcript_2026-08-03.txt` |
+| Output | `meeting_notes_YYYY-MM-DD.txt` | `meeting_notes_2026-08-03.txt` |
 
 ## Environment variables
 

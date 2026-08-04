@@ -5,7 +5,12 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
-from encoding import read_transcript, save_output
+from encoding import (
+    extract_date,
+    list_pending_transcripts,
+    read_transcript,
+    save_output,
+)
 
 # New Import for Memory.
 from langgraph.checkpoint.memory import InMemorySaver
@@ -16,6 +21,18 @@ load_dotenv()
 ## Step 1: Defining Agent Behaviour
 SYSTEM_PROMPT = """
 You are an Intelligent Meeting Notes Assistant.
+
+This agent works across multiple messages in the same session, and must remember:
+- What the user said earlier
+- What you previously explained
+- The meeting transcript you already analyzed
+
+If the user asks a question like:
+- "Can you remind me what the meeting was about?"
+- "What did you extract earlier?"
+- "What decisions did we identify?"
+
+you should use your memory of previous steps to answer.
 
 Your responsibilities:
 - Identify key discussion points from the meeting transcript
@@ -28,9 +45,6 @@ Rules:
 - Do NOT add information that is not in the transcript
 - Be accurate, factual, and concise
 """
-
-# Transcript file name inside input/transcripts/
-TRANSCRIPT_FILE = "transcript_2026-08-03.txt"
 
 
 # Step 2: Defining Tools that LLM can use
@@ -95,21 +109,28 @@ def format_content(content) -> str:
 
 
 def main():
-    # Read the transcript from input/transcripts/
-    transcript = read_transcript(TRANSCRIPT_FILE)
+    pending = list_pending_transcripts()
 
-    print("\n--- Agent Output ---\n")
+    if not pending:
+        print("All transcripts are already processed. Nothing to do.")
+        return
 
-    result = agent.invoke({
-        "messages": [HumanMessage(content=transcript)]
-    })
+    print(f"Found {len(pending)} pending transcript(s).\n")
 
-    output_text = format_content(result["messages"][-1].content)
-    print(output_text)
+    for transcript_path in pending:
+        transcript_date = extract_date(transcript_path)
+        print(f"--- Processing {transcript_path.name} ---\n")
 
-    # Save output to output/ with today's date in the filename
-    output_path = save_output(output_text)
-    print(f"\nSaved output to: {output_path}")
+        transcript = read_transcript(transcript_path)
+        result = agent.invoke({
+            "messages": [HumanMessage(content=transcript)]
+        })
+
+        output_text = format_content(result["messages"][-1].content)
+        print(output_text)
+
+        output_path = save_output(output_text, transcript_date=transcript_date)
+        print(f"\nSaved output to: {output_path}\n")
 
 
 if __name__ == "__main__":
