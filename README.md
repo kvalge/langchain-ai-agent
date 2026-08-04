@@ -11,6 +11,7 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 
 - LangChain agent powered by Google Gemini
 - Conversational session with short-term memory (one thread per transcript date)
+- `@tool`-decorated helpers (`extract_key_points`, `extract_decisions`, `extract_action_items`, `summarize_transcript`) used while drafting notes
 - Drop transcripts into `input/transcripts/` — no hardcoded filename in code
 - Auto-discovers pending `transcript_YYYY-MM-DD.txt` files and skips already-processed dates
 - Follow-up questions in the terminal before saving
@@ -26,7 +27,7 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 │   └── transcripts/          # Meeting transcript input files
 ├── output/                   # Generated meeting notes (dated filenames)
 ├── transcript_io.py          # Transcript discovery / dated outputs / README links
-├── tools.py                  # Agent helper tools
+├── tools.py                  # @tool helpers for notes sections (MEETING_TOOLS)
 ├── main.py                   # Agent + conversational session entry point
 ├── .env.example
 ├── requirements.txt
@@ -38,7 +39,7 @@ Intelligent meeting notes agent that analyses transcripts, highlights key discus
 | `input/transcripts/` | Place `transcript_YYYY-MM-DD.txt` files here |
 | `output/` | Final `meeting_notes_YYYY-MM-DD.txt` files (written after `exit`) |
 | `main.py` | Runs the agent and follow-up session |
-| `tools.py` | Extraction helper tools for the agent |
+| `tools.py` | `@tool` extraction helpers aligned to notes sections |
 | `transcript_io.py` | Discovery, file I/O, and README link updates |
 
 ## Prerequisites

@@ -8,7 +8,7 @@ from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
 
-from tools import extract_action_items, extract_key_points, preview_transcript
+from tools import MEETING_TOOLS
 from transcript_io import (
     extract_date,
     list_pending_transcripts,
@@ -27,31 +27,40 @@ You must remember across messages in the same session:
 - The latest version of the structured meeting notes
 
 When the user first sends a transcript, produce clean structured meeting notes with:
+- Summary
 - Key discussion points
 - Decisions made
 - Action items with responsible owners (when stated)
-- A short summary
 
 When the user asks follow-up questions, answer from session memory.
 If they ask you to revise the notes, update the structured notes accordingly.
+Re-run extraction tools only when the user asks to re-extract or the notes need a fresh pass.
 
 When asked for the final meeting notes document, return only the complete,
 up-to-date structured notes (ready to save to a file), with no extra chat framing.
 
 Rules:
-- Use tools when they help extract candidate lines from the transcript
-- Do NOT add information that is not in the transcript or confirmed by the user
+- For the first draft, you MUST call these tools on the transcript before writing notes:
+  extract_key_points, extract_decisions, extract_action_items, summarize_transcript
+- Base each section primarily on the matching tool results plus the transcript
+- Do NOT invent discussion points, decisions, or action items that are absent from
+  the tool results and the transcript
 - Be accurate, factual, and concise
 """
 
 INITIAL_NOTES_INSTRUCTION = """
 Analyze the following meeting transcript and produce structured meeting notes.
 
-Include these sections:
-1. Summary
-2. Key discussion points
-3. Decisions
-4. Action items (with owners when available)
+Required workflow:
+1. Call extract_key_points on the full transcript
+2. Call extract_decisions on the full transcript
+3. Call extract_action_items on the full transcript
+4. Call summarize_transcript on the full transcript
+5. Only after those tool calls, compose the notes with these sections:
+   - Summary
+   - Key discussion points
+   - Decisions
+   - Action items (with owners when available)
 
 Transcript:
 """
@@ -83,10 +92,9 @@ def build_agent(model_name: str, api_key: str):
     """Create the Gemini-backed agent with short-term memory."""
     model = ChatGoogleGenerativeAI(model=model_name, google_api_key=api_key)
     memory = InMemorySaver()
-    tools = [extract_key_points, extract_action_items, preview_transcript]
     return create_agent(
         model=model,
-        tools=tools,
+        tools=MEETING_TOOLS,
         system_prompt=SYSTEM_PROMPT,
         checkpointer=memory,
     )
@@ -116,12 +124,52 @@ def format_content(content) -> str:
     return str(content)
 
 
-def invoke_agent(agent, message: str, transcript_date: str) -> str:
+def tool_names_from_result(result: dict) -> list[str]:
+    """Collect tool names invoked during an agent run."""
+    names: list[str] = []
+    for message in result.get("messages", []):
+        tool_calls = getattr(message, "tool_calls", None) or []
+        for call in tool_calls:
+            if isinstance(call, dict):
+                name = call.get("name")
+            else:
+                name = getattr(call, "name", None)
+            if name:
+                names.append(name)
+
+        message_type = getattr(message, "type", None)
+        message_name = getattr(message, "name", None)
+        if message_type == "tool" and message_name:
+            names.append(message_name)
+
+    # Preserve order, drop duplicates
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for name in names:
+        if name not in seen:
+            seen.add(name)
+            ordered.append(name)
+    return ordered
+
+
+def invoke_agent(
+    agent,
+    message: str,
+    transcript_date: str,
+    *,
+    report_tools: bool = False,
+) -> str:
     """Invoke the agent with thread memory and return plain-text content."""
     result = agent.invoke(
         {"messages": [HumanMessage(content=message)]},
         config=thread_config(transcript_date),
     )
+    if report_tools:
+        used = tool_names_from_result(result)
+        if used:
+            print(f"Tools used: {', '.join(used)}\n")
+        else:
+            print("Tools used: (none)\n")
     return format_content(result["messages"][-1].content)
 
 
@@ -194,6 +242,7 @@ def process_transcript(agent, transcript_path) -> None:
         agent,
         INITIAL_NOTES_INSTRUCTION + transcript,
         transcript_date,
+        report_tools=True,
     )
     print(notes)
 
